@@ -1,0 +1,21 @@
+{
+  "name": "tello-node",
+  "version": "1.0.0",
+  "description": "Tello Server",
+  "main": "bin/index.js",
+  "scripts": {
+    "start": "node ./bin/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "drone",
+    "tello"
+  ],
+  "author": "Nick Nance",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.6.8",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  }
+}
