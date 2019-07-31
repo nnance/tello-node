@@ -1,27 +1,11 @@
-import { createSocket } from "dgram";
-import { AddressInfo } from "net";
-const server = createSocket('udp4');
+import { connect, errorHandler } from "./listener";
 
-server.on('error', (err) => {
-    console.log(`server error:\n${err.stack}`);
-    server.close();
-});
+const logger = console.log;
 
-server.on('message', (msg, rinfo) => {
-    console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
-});
+const droneAddr = "192.168.10.1";
+const dronePort = 8889;
 
-server.on('listening', () => {
-    const address = server.address() as AddressInfo;
-    console.log(`server listening ${address.address}:${address.port}`);
-});
+const drone = connect(logger)(dronePort);    
+const droneState = connect(logger)(8890);
 
-export const launch = () => {
-    console.log("launched");
-};
-
-const main = () => {
-    server.bind(41234);
-}
-
-main();
+drone.send("command", dronePort, droneAddr);
