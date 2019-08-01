@@ -19,6 +19,16 @@ const listeningHandler = (drone: Socket) => () => {
     console.log(`server listening ${address.address}:${address.port}`);
 }
 
+export const stateParser = (state: String) => {
+    const splitKeyVal = (key: string) => key.split(":");
+    const stateObj = (key: string) => ({ [splitKeyVal(key)[0]]: splitKeyVal(key)[1]});
+    const isKey = (val: string) => val.length > 0;
+    const addKey = (acc: {}, key: string) => Object.assign(acc, stateObj(key))
+
+    const parsedObj = state.split(";").filter(isKey).reduce(addKey, {});
+    return parsedObj;
+}
+
 export const connect = (logger: Logger) => (port: number) => {
 
     const drone = createSocket('udp4');
