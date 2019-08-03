@@ -1,6 +1,11 @@
+/**
+ * listens for drone events and logs them
+ */
+
 import { Socket, RemoteInfo } from "dgram";
 import { AddressInfo } from "net";
 import { Logger } from "./ports";
+import { throttle } from "lodash";
 
 export const errorHandler = (log: Logger, drone: Socket) => (err: Error | null, bytes: number) => {
     if (err) log(`server error:\n${err.stack}`)
@@ -11,8 +16,9 @@ const messageHandler = (log: Logger) => (msg: string, rinfo: RemoteInfo) => {
     log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`)
 }
 
-const listeningHandler = (log: Logger, port: number, address: string) => () => {
-    log(`server listening ${address}:${port}`)
+const listeningHandler = (log: Logger, drone: Socket) => () => {
+    const addr = drone.address() as AddressInfo
+    log(`server listening ${addr.address}:${addr.port}`)
 }
 
 export const stateParser = (state: String) => {
@@ -25,10 +31,13 @@ export const stateParser = (state: String) => {
     return parsedObj
 }
 
-export const connect = (logger: Logger, drone: Socket) => {
-    const addr = drone.address() as AddressInfo
+export const connect = (logger: Logger, drone: Socket, listener?: (state: {}) => void, ) => {
+    // drone sends hundreds of messages per minute so this handler will throttle them to only send on defined interval
+    const msgThrottler = throttle(messageHandler(logger), 2000)
 
-    drone.on('message', messageHandler(logger))
+    drone.on('message', msgThrottler)
     drone.on('error', errorHandler(logger, drone))
-    drone.on('listening', listeningHandler(logger, addr.port, addr.address))
+    drone.on('listening', listeningHandler(logger, drone))
+
+    if (listener) drone.on('message', (msg: string) => listener(stateParser(msg)))
 }

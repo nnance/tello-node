@@ -1,3 +1,7 @@
+/**
+ * the drone flight controller that provides an api on top of the Tello sdk
+ */
+
 import { ISendCmd } from "./ports";
 
 export enum Direction {
@@ -8,7 +12,7 @@ export enum Direction {
 }
 
 export interface IController {
-    takeOff: () => void,
+    takeOff: () => Promise<void>,
     land: () => void,
     emergency: () => void,
     up: (cm: number) => void,
@@ -19,24 +23,34 @@ export interface IController {
     back: (cm: number) => void,
     rotateClockwise: (degrees: number) => void,
     rotateCounterClockwise: (degrees: number) => void,
-    flip: (direction: Direction) => void,
+    flip: (direction: Direction) => Promise<void>,
     stop: () => void,
     wait: (ms: number) => Promise<void>,
 }
 
-export const controller = (send: ISendCmd): IController => ({
-    takeOff: () => send("takeoff"),
-    land: () => send("land"),
-    emergency: () => send("emergency"),
-    up: (cm: number) => send(`up ${cm}`),
-    down: (cm: number) => send(`down ${cm}`),
-    left: (cm: number) => send(`left ${cm}`),
-    right: (cm: number) => send(`right ${cm}`),
-    forward: (cm: number) => send(`forward ${cm}`),
-    back: (cm: number) => send(`back ${cm}`),
-    rotateClockwise: (degrees: number) => send(`cw ${degrees}`),
-    rotateCounterClockwise: (degrees: number) => send(`ccw ${degrees}`),
-    flip: (direction: Direction) => send(`flip ${direction}`),
-    stop: () => send("stop"),
-    wait: (ms: number) => new Promise((res, rej) => {setTimeout(() => res(), ms)}),
-})
+const wait = (ms: number): Promise<void> => new Promise((res, rej) => {setTimeout(() => res(), ms)})
+
+const sendWithWait = (send: ISendCmd) => (cmd: string, ms: number) => {
+    send(cmd)
+    return wait(ms)
+}
+
+export const controller = (send: ISendCmd): IController => {
+    const waiter = sendWithWait(send)
+    return {
+        takeOff: () => waiter("takeoff", 6000),
+        land: () => send("land"),
+        emergency: () => send("emergency"),
+        up: (cm: number) => send(`up ${cm}`),
+        down: (cm: number) => send(`down ${cm}`),
+        left: (cm: number) => send(`left ${cm}`),
+        right: (cm: number) => send(`right ${cm}`),
+        forward: (cm: number) => send(`forward ${cm}`),
+        back: (cm: number) => send(`back ${cm}`),
+        rotateClockwise: (degrees: number) => send(`cw ${degrees}`),
+        rotateCounterClockwise: (degrees: number) => send(`ccw ${degrees}`),
+        flip: (direction: Direction) => waiter(`flip ${direction}`, 4000),
+        stop: () => send("stop"),
+        wait,
+    }
+}
