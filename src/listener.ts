@@ -1,22 +1,18 @@
-import { createSocket, RemoteInfo, Socket } from "dgram"
-import { AddressInfo } from "net"
+import { Socket, RemoteInfo } from "dgram";
+import { AddressInfo } from "net";
+import { Logger } from "./ports";
 
-export interface Logger {
-    (msg: string): void
-}
-
-export const errorHandler = (drone: Socket) => (err: Error | null, bytes: number) => {
-    if (err) console.log(`server error:\n${err.stack}`)
+export const errorHandler = (log: Logger, drone: Socket) => (err: Error | null, bytes: number) => {
+    if (err) log(`server error:\n${err.stack}`)
     drone.close()
 }
 
-const messageHandler = (msg: string, rinfo: RemoteInfo) => {
-    console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`)
+const messageHandler = (log: Logger) => (msg: string, rinfo: RemoteInfo) => {
+    log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`)
 }
 
-const listeningHandler = (drone: Socket) => () => {
-    const address = drone.address() as AddressInfo
-    console.log(`server listening ${address.address}:${address.port}`)
+const listeningHandler = (log: Logger, port: number, address: string) => () => {
+    log(`server listening ${address}:${port}`)
 }
 
 export const stateParser = (state: String) => {
@@ -29,14 +25,10 @@ export const stateParser = (state: String) => {
     return parsedObj
 }
 
-export const connect = (logger: Logger) => (port: number, address?: string) => {
+export const connect = (logger: Logger, drone: Socket) => {
+    const addr = drone.address() as AddressInfo
 
-    const drone = createSocket('udp4')
-    drone.bind(port, address)
-
-    drone.on('error', errorHandler(drone))
-    drone.on('message', messageHandler)
-    drone.on('listening', listeningHandler(drone))
-
-    return drone    
+    drone.on('message', messageHandler(logger))
+    drone.on('error', errorHandler(logger, drone))
+    drone.on('listening', listeningHandler(logger, addr.port, addr.address))
 }

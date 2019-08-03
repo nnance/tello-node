@@ -1,9 +1,4 @@
-import { Socket } from "dgram";
-import { AddressInfo } from "net";
-
-export interface ISendCmd {
-    (command: string): void
-}
+import { ISendCmd } from "./ports";
 
 export enum Direction {
     left = "l",
@@ -29,11 +24,6 @@ export interface IController {
     wait: (ms: number) => Promise<void>,
 }
 
-const sendCmd = (drone: Socket, cmd: string) => {
-    const addr = drone.address() as AddressInfo;
-    drone.send(cmd, addr.port, addr.address);
-}
-
 export const controller = (send: ISendCmd): IController => ({
     takeOff: () => send("takeoff"),
     land: () => send("land"),
@@ -50,9 +40,3 @@ export const controller = (send: ISendCmd): IController => ({
     stop: () => send("stop"),
     wait: (ms: number) => new Promise((res, rej) => {setTimeout(() => res(), ms)}),
 })
-
-export const droneController = (drone: Socket): IController => {
-    const send = (cmd: string) => sendCmd(drone, cmd);
-    send("command");
-    return controller(send)
-}

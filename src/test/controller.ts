@@ -7,6 +7,7 @@ const spy = (arg: any) => calledWith = arg
 
 describe("drone controller", () => {
     const ctrl = controller(spy)
+
     it("should send takeoff when takeOff is called", () => {
         ctrl.takeOff()
         equal(calledWith, "takeoff")
