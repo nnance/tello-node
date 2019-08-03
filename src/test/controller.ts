@@ -6,18 +6,19 @@ let calledWith: any
 const spy = (arg: any) => calledWith = arg
 
 describe("drone controller", () => {
+    const ctrl = controller(spy)
     it("should send takeoff when takeOff is called", () => {
-        controller(spy).takeOff()
+        ctrl.takeOff()
         equal(calledWith, "takeoff")
     })
 
     it("should send up with height", () => {
-        controller(spy).up(10)
+        ctrl.up(10)
         equal(calledWith, "up 10")
     })
 
     it("should send flip with direction", () => {
-        controller(spy).flip(Direction.left)
+        ctrl.flip(Direction.left)
         equal(calledWith, "flip l")
     })
 
@@ -26,7 +27,7 @@ describe("drone controller", () => {
 
         setTimeout(() => long = true, 40)
         setTimeout(() => short = true, 10)
-        return await controller(spy).wait(20).then(() => {
+        return await ctrl.wait(20).then(() => {
             equal(short, true)
             equal(long, false)
         })

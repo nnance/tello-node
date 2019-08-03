@@ -24,8 +24,8 @@ const droneStatusObj = {
 
 describe('Drone Listener', () => {
     describe('stateParser', () => {
+        const parsed = stateParser(droneStatus)
         it('should return the same value', () => {
-            const parsed = stateParser(droneStatus)
             equal(Object.keys(parsed).length, Object.keys(droneStatusObj).length)
         })
     })
