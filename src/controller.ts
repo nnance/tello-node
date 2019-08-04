@@ -12,19 +12,19 @@ export enum Direction {
 }
 
 export interface IController {
-    takeOff: () => Promise<void>,
-    land: () => Promise<void>,
-    emergency: () => Promise<void>,
-    up: (cm: number) => Promise<void>,
-    down: (cm: number) => Promise<void>,
-    left: (cm: number) => Promise<void>,
-    right: (cm: number) => Promise<void>,
-    forward: (cm: number) => Promise<void>,
-    back: (cm: number) => Promise<void>,
-    rotateClockwise: (degrees: number) => Promise<void>,
-    rotateCounterClockwise: (degrees: number) => Promise<void>,
-    flip: (direction: Direction) => Promise<void>,
-    stop: () => Promise<void>,
+    takeOff: (ms?: number) => Promise<void>,
+    land: (ms?: number) => Promise<void>,
+    emergency: (ms?: number) => Promise<void>,
+    up: (cm: number, ms?: number) => Promise<void>,
+    down: (cm: number, ms?: number) => Promise<void>,
+    left: (cm: number, ms?: number) => Promise<void>,
+    right: (cm: number, ms?: number) => Promise<void>,
+    forward: (cm: number, ms?: number) => Promise<void>,
+    back: (cm: number, ms?: number) => Promise<void>,
+    rotateClockwise: (degrees: number, ms?: number) => Promise<void>,
+    rotateCounterClockwise: (degrees: number, ms?: number) => Promise<void>,
+    flip: (direction: Direction, ms?: number) => Promise<void>,
+    stop: (ms?: number) => Promise<void>,
     wait: (ms: number) => Promise<void>,
 }
 
@@ -32,7 +32,7 @@ const waiterDef = 2000
 
 const wait = (ms: number): Promise<void> => new Promise((res, rej) => {setTimeout(() => res(), ms)})
 
-const sendWithWait = (send: ISendCmd) => (cmd: string, ms = waiterDef) => {
+const sendWithWait = (send: ISendCmd) => (cmd: string, ms = 1) => {
     send(cmd)
     return wait(ms)
 }
@@ -41,19 +41,19 @@ export const controller = (send: ISendCmd): IController => {
     const waiter = sendWithWait(send)
 
     return {
-        takeOff: () => waiter("takeoff", 6000),
-        land: () => waiter("land", 5000),
-        emergency: () => waiter("emergency"),
-        up: (cm: number) => waiter(`up ${cm}`),
-        down: (cm: number) => waiter(`down ${cm}`),
-        left: (cm: number) => waiter(`left ${cm}`),
-        right: (cm: number) => waiter(`right ${cm}`),
-        forward: (cm: number) => waiter(`forward ${cm}`),
-        back: (cm: number) => waiter(`back ${cm}`),
-        rotateClockwise: (degrees: number) => waiter(`cw ${degrees}`),
-        rotateCounterClockwise: (degrees: number) => waiter(`ccw ${degrees}`),
-        flip: (direction: Direction) => waiter(`flip ${direction}`, 4000),
-        stop: () => waiter("stop"),
+        takeOff: (ms = 6000) => waiter("takeoff", ms),
+        land: (ms = 5000) => waiter("land", ms),
+        emergency: (ms = waiterDef) => waiter("emergency", ms),
+        up: (cm: number, ms = waiterDef) => waiter(`up ${cm}`, ms),
+        down: (cm: number, ms = waiterDef) => waiter(`down ${cm}`, ms),
+        left: (cm: number, ms = waiterDef) => waiter(`left ${cm}`, ms),
+        right: (cm: number, ms = waiterDef) => waiter(`right ${cm}`, ms),
+        forward: (cm: number, ms = waiterDef) => waiter(`forward ${cm}`, ms),
+        back: (cm: number, ms = waiterDef) => waiter(`back ${cm}`, ms),
+        rotateClockwise: (degrees: number, ms = waiterDef) => waiter(`cw ${degrees}`, ms),
+        rotateCounterClockwise: (degrees: number, ms = waiterDef) => waiter(`ccw ${degrees}`, ms),
+        flip: (direction: Direction, ms = 4000) => waiter(`flip ${direction}`, ms),
+        stop: (ms = waiterDef) => waiter("stop", ms),
         wait,
     }
 }

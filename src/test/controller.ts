@@ -9,17 +9,17 @@ describe("drone controller", () => {
     const ctrl = controller(spy)
 
     it("should send takeoff when takeOff is called", () => {
-        ctrl.takeOff()
+        ctrl.takeOff(1)
         equal(calledWith, "takeoff")
     })
 
     it("should send up with height", () => {
-        ctrl.up(10)
+        ctrl.up(10, 1)
         equal(calledWith, "up 10")
     })
 
     it("should send flip with direction", () => {
-        ctrl.flip(Direction.left)
+        ctrl.flip(Direction.left, 1)
         equal(calledWith, "flip l")
     })
 
