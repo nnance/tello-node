@@ -26,5 +26,13 @@ describe("drone", () => {
             equal(cmdCallStack[1], "send:command")
             equal(cmdCallStack[2], "factory:8890")
         })
+
+        describe("when disconnecting", () => {
+            it("should close both network connections", () => {
+                drone.disconnect()
+                equal(cmdCallStack.filter((val) => val == "close").length, 2)
+            })
+        })
     })
+
 })

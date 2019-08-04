@@ -32,9 +32,11 @@
     "extends": "@istanbuljs/nyc-config-typescript",
     "all": true,
     "check-coverage": true,
+    "lines": 80,
     "exclude": [
       "**/adapters",
-      "**/test"
+      "**/test",
+      "src/index.ts"
     ]
   }
 }
