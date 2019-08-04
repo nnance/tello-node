@@ -1,0 +1,10 @@
+server got: pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:90;temph:93;tof:10;h:0;bat:89;baro:-26.65;time:17;agx:3.00;agy:-5.00;agz:-997.00;
+server got: pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:90;temph:93;tof:10;h:0;bat:89;baro:-26.48;time:17;agx:2.00;agy:-6.00;agz:-1000.00;
+server got: pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:90;temph:93;tof:10;h:0;bat:89;baro:-26.73;time:17;agx:1.00;agy:-8.00;agz:-998.00;
+server got: pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:90;temph:93;tof:10;h:0;bat:89;baro:-26.45;time:17;agx:1.00;agy:-6.00;agz:-999.00;
+server got: pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:90;temph:93;tof:10;h:0;bat:89;baro:-26.43;time:17;agx:1.00;agy:-6.00;agz:-1000.00;
+server got: pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:90;temph:93;tof:10;h:0;bat:89;baro:-26.54;time:17;agx:4.00;agy:-5.00;agz:-1000.00;
+server got: pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:90;temph:93;tof:10;h:0;bat:89;baro:-26.60;time:17;agx:2.00;agy:-6.00;agz:-1002.00;
+server got: pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:90;temph:93;tof:10;h:0;bat:89;baro:-26.45;time:17;agx:3.00;agy:-7.00;agz:-1000.00;
+server got: pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:90;temph:93;tof:10;h:0;bat:89;baro:-26.59;time:17;agx:2.00;agy:-5.00;agz:-998.00;
+server got: pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:90;temph:93;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:3.00;agy:-6.00;agz:-997.00;
