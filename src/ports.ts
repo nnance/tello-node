@@ -15,5 +15,5 @@ export interface ICommandConnection {
 }
 
 export interface ICommandConnectionFactory {
-    (logger: ILogger, port: number): ICommandConnection
+    (logger: ILogger, port: number, address?: string): ICommandConnection
 }

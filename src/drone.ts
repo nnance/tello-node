@@ -1,23 +1,23 @@
 import { IController, controller } from "./controller"
 import { connect as connectListener } from "./listener"
-import { ILogger } from "./ports";
-import { commandFactory } from "./adapters/networking";
+import { ILogger, ICommandConnectionFactory } from "./ports";
 
 export interface IDrone {
     address: string,
     port: number,
     controller: IController,
+    disconnect: () => void,
 }
 
-export const connect = (logger: ILogger, port = 8889, address?: string) => {
+export const factory = (logger: ILogger, factory: ICommandConnectionFactory, port = 8889, address = "0.0.0.0"): IDrone => {
 
-    const drone = commandFactory(logger, port, address)
+    const drone = factory(logger, port, address)
 
     // enter SDK mode to send commands to the drone
     // NOTE: This must be done before setting up the listener
     drone.send("command");
 
-    const droneState = commandFactory(logger, 8890)
+    const droneState = factory(logger, 8890)
     connectListener(logger, droneState)
 
     return {

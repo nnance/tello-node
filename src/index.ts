@@ -1,14 +1,16 @@
-import { connect } from "./drone";
+import { factory } from "./drone";
 import { logger } from "./adapters/logging";
 import { Direction } from "./controller";
+import { commandFactory } from "./adapters/networking";
 
-const drone = connect(logger, 8889, "192.168.10.1");
+const drone = factory(logger, commandFactory, 8889, "192.168.10.1");
 
 const mission = async () => {
-    await drone.controller.takeOff();
-    await drone.controller.flip(Direction.back);
-    await drone.controller.land();
-    await drone.controller.wait(1000);
+    await drone.controller.wait(1000)
+    await drone.controller.takeOff()
+    await drone.controller.flip(Direction.left)
+    await drone.controller.land()
+    await drone.controller.wait(1000)
     drone.disconnect();
 }
 
