@@ -1,3 +1,3 @@
-import { Logger } from "../ports";
+import { ILogger } from "../ports";
 
-export const logger: Logger = console.log
+export const logger: ILogger = console.log

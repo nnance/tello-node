@@ -1,24 +1,20 @@
 /**
  * listens for drone events and logs them
  */
-
-import { Socket, RemoteInfo } from "dgram";
-import { AddressInfo } from "net";
-import { Logger } from "./ports";
+import { ILogger, ICommandConnection } from "./ports";
 import { throttle } from "lodash";
 
-export const errorHandler = (log: Logger, drone: Socket) => (err: Error | null, bytes: number) => {
+export const errorHandler = (log: ILogger, drone: ICommandConnection) => (err: Error | null, bytes: number) => {
     if (err) log(`server error:\n${err.stack}`)
     drone.close()
 }
 
-const messageHandler = (log: Logger) => (msg: string, rinfo: RemoteInfo) => {
-    log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`)
+const messageHandler = (log: ILogger, drone: ICommandConnection) => (msg: string) => {
+    log(`server got: ${msg} from ${drone.address}:${drone.port}`)
 }
 
-const listeningHandler = (log: Logger, drone: Socket) => () => {
-    const addr = drone.address() as AddressInfo
-    log(`server listening ${addr.address}:${addr.port}`)
+const listeningHandler = (log: ILogger, drone: ICommandConnection) => () => {
+    log(`server listening ${drone.address}:${drone.port}`)
 }
 
 export const stateParser = (state: String) => {
@@ -31,9 +27,9 @@ export const stateParser = (state: String) => {
     return parsedObj
 }
 
-export const connect = (logger: Logger, drone: Socket, listener?: (state: {}) => void, ) => {
+export const connect = (logger: ILogger, drone: ICommandConnection, listener?: (state: {}) => void, ) => {
     // drone sends hundreds of messages per minute so this handler will throttle them to only send on defined interval
-    const msgThrottler = throttle(messageHandler(logger), 2000)
+    const msgThrottler = throttle(messageHandler(logger, drone), 2000)
 
     drone.on('message', msgThrottler)
     drone.on('error', errorHandler(logger, drone))
