@@ -2,7 +2,8 @@
  * the drone flight controller that provides an api on top of the Tello sdk
  */
 
-import { ISendCmd } from "./ports";
+import { ISendCmd, ICommandConnection } from "./ports";
+import { FlightState, eventProcessorFactory } from "./sensors";
 
 export enum Direction {
     left = "l",
@@ -30,30 +31,53 @@ export interface IController {
 
 const waiterDef = 2000
 
-const wait = (ms: number): Promise<void> => new Promise((res, rej) => {setTimeout(() => res(), ms)})
+export const controller = (send: ISendCmd, drone?: ICommandConnection): IController => {
+    let flightState = FlightState.landed
 
-const sendWithWait = (send: ISendCmd) => (cmd: string, ms = 1) => {
-    send(cmd)
-    return wait(ms)
-}
+    const sendWait = (cmd: string, ms = 1): Promise<void> => {
+        send(cmd)
+        return new Promise((res, rej) => setTimeout(res, ms))
+    }
+    
+    // this sets up the flight state handler to track the current flight state
+    if (drone) {
+        drone.on("message", eventProcessorFactory((state: FlightState) => flightState = state))
+    }
 
-export const controller = (send: ISendCmd): IController => {
-    const waiter = sendWithWait(send)
-
+    // send command and wait until flight state is reached or timeout occurs
+    const sendUntil = (cmd: string, ms?: number, state = FlightState.hovering): Promise<void> => {
+        send(cmd)
+        return new Promise((res, rej) => {
+            let timerId = setInterval(() => {
+                if (flightState == state) {
+                    console.log("isHovering")
+                    clearInterval(timerId)
+                    clearTimeout(timeoutId)
+                    res()
+                }
+            }, 500)
+            let timeoutId = setTimeout(() => {
+                clearInterval(timerId)
+                console.error("timed out")
+                res()
+            }, ms)
+        })
+    }
+    
     return {
-        takeOff: (ms = 6000) => waiter("takeoff", ms),
-        land: (ms = 5000) => waiter("land", ms),
-        emergency: (ms = waiterDef) => waiter("emergency", ms),
-        up: (cm: number, ms = waiterDef) => waiter(`up ${cm}`, ms),
-        down: (cm: number, ms = waiterDef) => waiter(`down ${cm}`, ms),
-        left: (cm: number, ms = waiterDef) => waiter(`left ${cm}`, ms),
-        right: (cm: number, ms = waiterDef) => waiter(`right ${cm}`, ms),
-        forward: (cm: number, ms = waiterDef) => waiter(`forward ${cm}`, ms),
-        back: (cm: number, ms = waiterDef) => waiter(`back ${cm}`, ms),
-        rotateClockwise: (degrees: number, ms = waiterDef) => waiter(`cw ${degrees}`, ms),
-        rotateCounterClockwise: (degrees: number, ms = waiterDef) => waiter(`ccw ${degrees}`, ms),
-        flip: (direction: Direction, ms = 4000) => waiter(`flip ${direction}`, ms),
-        stop: (ms = waiterDef) => waiter("stop", ms),
-        wait,
+        takeOff: (ms = 6000) => sendUntil("takeoff", ms),
+        land: (ms = 5000) => sendWait("land", ms),
+        emergency: (ms = waiterDef) => sendWait("emergency", ms),
+        up: (cm: number, ms = waiterDef) => sendWait(`up ${cm}`, ms),
+        down: (cm: number, ms = waiterDef) => sendWait(`down ${cm}`, ms),
+        left: (cm: number, ms = waiterDef) => sendWait(`left ${cm}`, ms),
+        right: (cm: number, ms = waiterDef) => sendWait(`right ${cm}`, ms),
+        forward: (cm: number, ms = waiterDef) => sendWait(`forward ${cm}`, ms),
+        back: (cm: number, ms = waiterDef) => sendWait(`back ${cm}`, ms),
+        rotateClockwise: (degrees: number, ms = waiterDef) => sendWait(`cw ${degrees}`, ms),
+        rotateCounterClockwise: (degrees: number, ms = waiterDef) => sendWait(`ccw ${degrees}`, ms),
+        flip: (direction: Direction, ms = 4000) => sendUntil(`flip ${direction}`, ms),
+        stop: (ms = waiterDef) => sendWait("stop", ms),
+        wait: (ms: number) => new Promise((res, rej) => setTimeout(res, ms)),
     }
 }

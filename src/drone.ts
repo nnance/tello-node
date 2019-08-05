@@ -23,7 +23,7 @@ export const factory = (logger: ILogger, factory: ICommandConnectionFactory, por
     return {
         address,
         port,
-        controller: controller(drone.send),
+        controller: controller(drone.send, droneState),
         disconnect: () => {
             droneState.close()
             drone.close()

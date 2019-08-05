@@ -10,7 +10,6 @@ const mission = async () => {
     await drone.controller.takeOff()
     await drone.controller.flip(Direction.left)
     await drone.controller.land()
-    await drone.controller.wait(1000)
     drone.disconnect();
 }
 
