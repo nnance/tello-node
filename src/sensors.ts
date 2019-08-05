@@ -18,7 +18,11 @@ const trimQueue = (maxQueueDepth: number) => (queue: string[]) => {
 }
 
 const isMoving = (queue: string[]) => {
-    return queue.filter((val) => val.indexOf("vgx:0;vgy:0;vgz:0;") < 0).length > 0
+    return queue.filter((val) => val.indexOf(";vgx:0;vgy:0;vgz:0;") > 0).length < queue.length
+}
+
+const isHovering = (queue: string[]) => {
+    return queue.filter((val) => val.indexOf(";h:0;") > 0).length < queue.length
 }
 
 export const eventProcessorFactory = (cb: FlightStateHandler, maxQueueDepth = 10, initialQueue = [] as string[]) => {
@@ -28,8 +32,10 @@ export const eventProcessorFactory = (cb: FlightStateHandler, maxQueueDepth = 10
         queue = trimmer(stateHandler(queue, msg))
         if (isMoving(queue)) {
             cb(FlightState.moving)
-        } else {
+        } else if (isHovering(queue)) {
             cb(FlightState.hovering)
+        } else {
+            cb(FlightState.landed)
         }
         return queue
     }
