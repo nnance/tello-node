@@ -59,13 +59,14 @@ const movementMonitor = (send: ISendCmd, drone?: ICommandConnection) => {
     }
 }
 
+const timeMonitor = (send: ISendCmd) => (cmd: string, ms = 1): Promise<void> => {
+    send(cmd)
+    return new Promise((res, rej) => setTimeout(res, ms))
+}
+
 export const controller = (send: ISendCmd, drone?: ICommandConnection): IController => {
 
-    const sendWait = (cmd: string, ms = 1): Promise<void> => {
-        send(cmd)
-        return new Promise((res, rej) => setTimeout(res, ms))
-    }
-
+    const sendWait = timeMonitor(send)
     const sendUntil = movementMonitor(send, drone)
     
     return {
