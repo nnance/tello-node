@@ -4,18 +4,7 @@ import { describe } from "mocha"
 
 import { eventProcessorFactory, FlightState } from "../sensors"
 
-const hoverQueue = [
-    "pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;",
-    "pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;",
-    "pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;",
-    "pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;",
-    "pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;",
-    "pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;",
-    "pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;",
-    "pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;",
-    "pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;",
-    "pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;",
-]
+const hoverQueue = new Array(10).fill("pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:10;h:0;bat:89;baro:-26.40;time:17;agx:2.00;agy:-7.00;agz:-999.00;")
 
 const voidHandler = (state: FlightState) => undefined
 

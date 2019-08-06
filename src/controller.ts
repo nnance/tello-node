@@ -29,55 +29,59 @@ export interface IController {
     wait: (ms: number) => Promise<void>,
 }
 
-const waiterDef = 2000
+const timeoutDefault = 2000
+const detectionInterval = 500
 
-export const controller = (send: ISendCmd, drone?: ICommandConnection): IController => {
+const movementMonitor = (send: ISendCmd, drone?: ICommandConnection) => {
     let flightState = FlightState.landed
 
-    const sendWait = (cmd: string, ms = 1): Promise<void> => {
-        send(cmd)
-        return new Promise((res, rej) => setTimeout(res, ms))
-    }
-    
     // this sets up the flight state handler to track the current flight state
     if (drone) {
         drone.on("message", eventProcessorFactory((state: FlightState) => flightState = state))
     }
 
     // send command and wait until flight state is reached or timeout occurs
-    const sendUntil = (cmd: string, ms?: number, state = FlightState.hovering): Promise<void> => {
+    return (cmd: string, ms?: number, state = FlightState.hovering): Promise<void> => {
         send(cmd)
         return new Promise((res, rej) => {
             let timerId = setInterval(() => {
                 if (flightState == state) {
-                    console.log("isHovering")
                     clearInterval(timerId)
                     clearTimeout(timeoutId)
                     res()
                 }
-            }, 500)
+            }, detectionInterval)
             let timeoutId = setTimeout(() => {
                 clearInterval(timerId)
-                console.error("timed out")
                 res()
             }, ms)
         })
     }
+}
+
+export const controller = (send: ISendCmd, drone?: ICommandConnection): IController => {
+
+    const sendWait = (cmd: string, ms = 1): Promise<void> => {
+        send(cmd)
+        return new Promise((res, rej) => setTimeout(res, ms))
+    }
+
+    const sendUntil = movementMonitor(send, drone)
     
     return {
         takeOff: (ms = 6000) => sendUntil("takeoff", ms),
-        land: (ms = 5000) => sendWait("land", ms),
-        emergency: (ms = waiterDef) => sendWait("emergency", ms),
-        up: (cm: number, ms = waiterDef) => sendWait(`up ${cm}`, ms),
-        down: (cm: number, ms = waiterDef) => sendWait(`down ${cm}`, ms),
-        left: (cm: number, ms = waiterDef) => sendWait(`left ${cm}`, ms),
-        right: (cm: number, ms = waiterDef) => sendWait(`right ${cm}`, ms),
-        forward: (cm: number, ms = waiterDef) => sendWait(`forward ${cm}`, ms),
-        back: (cm: number, ms = waiterDef) => sendWait(`back ${cm}`, ms),
-        rotateClockwise: (degrees: number, ms = waiterDef) => sendWait(`cw ${degrees}`, ms),
-        rotateCounterClockwise: (degrees: number, ms = waiterDef) => sendWait(`ccw ${degrees}`, ms),
-        flip: (direction: Direction, ms = 4000) => sendUntil(`flip ${direction}`, ms),
-        stop: (ms = waiterDef) => sendWait("stop", ms),
+        land: (ms = 5000) => sendUntil("land", ms, FlightState.landed),
+        emergency: (ms = timeoutDefault) => sendWait("emergency", ms),
+        up: (cm: number, ms = timeoutDefault) => sendWait(`up ${cm}`, ms),
+        down: (cm: number, ms = timeoutDefault) => sendWait(`down ${cm}`, ms),
+        left: (cm: number, ms = timeoutDefault) => sendWait(`left ${cm}`, ms),
+        right: (cm: number, ms = timeoutDefault) => sendWait(`right ${cm}`, ms),
+        forward: (cm: number, ms = timeoutDefault) => sendUntil(`forward ${cm}`, ms),
+        back: (cm: number, ms = timeoutDefault) => sendWait(`back ${cm}`, ms),
+        rotateClockwise: (degrees: number, ms = timeoutDefault) => sendWait(`cw ${degrees}`, ms),
+        rotateCounterClockwise: (degrees: number, ms = timeoutDefault) => sendWait(`ccw ${degrees}`, ms),
+        flip: (direction: Direction, ms = timeoutDefault) => sendUntil(`flip ${direction}`, ms),
+        stop: (ms = timeoutDefault) => sendWait("stop", ms),
         wait: (ms: number) => new Promise((res, rej) => setTimeout(res, ms)),
     }
 }
