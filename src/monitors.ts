@@ -4,7 +4,11 @@ import { ICommandConnection } from "./ports";
 const detectionInterval = 500
 const timeoutDefault = 30000
 
-export const movementMonitor = (drone?: ICommandConnection) => {
+export interface IMovementMonitor {
+    (ms?: number, state?: FlightState): Promise<void>
+}
+
+export const movementMonitor = (drone?: ICommandConnection): IMovementMonitor => {
     let flightState = FlightState.landed
 
     // this sets up the flight state handler to track the current flight state
