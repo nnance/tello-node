@@ -27,7 +27,7 @@ export const stateParser = (state: String) => {
     return parsedObj
 }
 
-export const connect = (logger: ILogger, drone: ICommandConnection, listener?: (state: {}) => void, ) => {
+export const connect = (logger: ILogger, drone: ICommandConnection, listener?: (state: {}) => void) => {
     // drone sends hundreds of messages per minute so this handler will throttle them to only send on defined interval
     const msgThrottler = throttle(messageHandler(logger, drone), 2000)
 

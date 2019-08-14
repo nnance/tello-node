@@ -1,8 +1,9 @@
 import { equal } from "assert"
 import { describe } from "mocha"
 
-import { factory } from "../drone"
+import { droneFactory, droneControllerFactory } from "../drone"
 import { ICommandConnection, ILogger } from "../ports"
+import { flow } from "lodash/fp";
 
 const loggerSpy: ILogger = (msg: string) => undefined
 
@@ -20,7 +21,8 @@ const commandFactorySpy = (logger: ILogger, port: number, address?: string): ICo
 
 describe("drone", () => {
     describe("when initializing", () => {
-        const drone = factory(loggerSpy, commandFactorySpy, 8889, "192.168.10.1")
+        const droneBuilder = flow(droneFactory, droneControllerFactory)
+        const drone = droneBuilder(loggerSpy, commandFactorySpy )
         it("should setup the network in the correct order", () => {
             equal(cmdCallStack[0], "factory:8889")
             equal(cmdCallStack[1], "send:command")

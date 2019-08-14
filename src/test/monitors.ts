@@ -23,15 +23,13 @@ const eventSender = (commands: string[]): IHandler => (event, cb) => {
     })
 }
 
-const commandFactorySpy = (handler: IHandler): ICommandConnection => {
-    return {
-        port: 80,
-        address: "0.0.0.0",
-        send: (cmd: string) => undefined,
-        on: handler,
-        close: () => undefined,
-    }
-}
+const commandFactorySpy = (handler: IHandler): ICommandConnection => ({
+    port: 80,
+    address: "0.0.0.0",
+    send: () => undefined,
+    on: handler,
+    close: () => undefined,
+})
 
 const flightMonitor = flow(eventSender, commandFactorySpy, movementMonitor)
 
