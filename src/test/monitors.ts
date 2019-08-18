@@ -1,12 +1,13 @@
 import { equal, ok } from "assert"
 import { flow } from "lodash/fp";
 
-import { timeMonitor, movementMonitorFactory, sensorOverride } from "../monitors";
+import { timeMonitor, movementMonitorFactory, sensorOverride, IMovementMonitor } from "../monitors";
 import { ICommandConnection } from "../ports";
 import { FlightState, sensorFactory } from "../sensors";
 
 import { events as takeoff } from "./fixtures/takeoff"
 import { events as flipLeft } from "./fixtures/flip-left"
+import { events as rotate } from "./fixtures/rotateClockwise"
 
 interface IHandler {
     (event: string, cb: (msg: string) => void): void
@@ -48,16 +49,39 @@ describe("Time Monitor", () => {
 })
 
 describe("Movement Monitor", () => {
+    let monitor: IMovementMonitor
     describe("When taking off", () => {
+        beforeEach(() => monitor = flightMonitor(takeoff))
+
+        it("should detect moving", async () => {
+            await monitor(2000, FlightState.moving)
+            ok(true)
+        })
         it("should detect hovering", async () => {
-            const monitor = flightMonitor(takeoff)
             await monitor(2000, FlightState.hovering)
             ok(true)
         })
     })
     describe("When flipping", () => {
+        beforeEach(() => monitor = flightMonitor(flipLeft))
+
+        it("should detect moving", async () => {
+            await monitor(2000, FlightState.moving)
+            ok(true)
+        })
         it("should detect hovering", async () => {
-            const monitor = flightMonitor(flipLeft)
+            await monitor(2000, FlightState.hovering)
+            ok(true)
+        })
+    })
+    describe("When rotating", () => {
+        beforeEach(() => monitor = flightMonitor(rotate))
+
+        it("should detect moving", async () => {
+            await monitor(2000, FlightState.moving)
+            ok(true)
+        })
+        it("should detect hovering", async () => {
             await monitor(2000, FlightState.hovering)
             ok(true)
         })

@@ -1,7 +1,7 @@
 import { FlightState, sensorFactory, FlightStateHandler } from "./sensors";
 import { ICommandConnection } from "./ports";
 
-const detectionInterval = 500
+const detectionInterval = 10
 const timeoutDefault = 30000
 
 export interface IMovementMonitor {
