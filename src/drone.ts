@@ -2,7 +2,7 @@ import { controller, Direction, IController } from "./controller"
 import { connect as connectListener } from "./listener"
 import { ILogger, ICommandConnectionFactory, ICommandConnection } from "./ports";
 import { movementMonitor, IMovementMonitor } from "./monitors";
-import { FlightState, sensorFactory } from "./sensors";
+import { FlightState } from "./sensors";
 
 export const takeOff = (ctrl: IController, monitor: IMovementMonitor) => (ms = 6000) => {
     ctrl.takeOff()
@@ -103,7 +103,7 @@ export const receiver = (logger: ILogger, connectFactory: ICommandConnectionFact
     connectListener(logger, connection)
     return {
         receiveConnection: connection,
-        movementMonitor: movementMonitor(sensorFactory(), connection),
+        movementMonitor: movementMonitor(connection),
     }
 }
 

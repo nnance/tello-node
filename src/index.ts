@@ -26,19 +26,4 @@ const moveMission = async () => {
     controller.disconnect()
 }
 
-const returnMisson = async () => {
-    await controller.takeOff()
-    await controller.rotateClockwise(180)
-    await controller.forward(120)
-    await controller.land()
-    controller.disconnect()
-}
-
-const rotateTest = async () => {
-    await controller.takeOff()
-    await controller.rotateClockwise(180)
-    await controller.land()
-    controller.disconnect()
-}
-
-rotateTest()
+moveMission()
