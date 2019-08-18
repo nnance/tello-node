@@ -1,12 +1,13 @@
 import { equal, ok } from "assert"
-import { flow } from "lodash/fp";
+import { flow, curry } from "lodash/fp";
 
 import { timeMonitor, movementMonitor } from "../monitors";
 import { ICommandConnection } from "../ports";
-import { FlightState } from "../sensors";
+import { FlightState, sensorFactory } from "../sensors";
 
 import { events as takeoff } from "./fixtures/takeoff"
 import { events as flipLeft } from "./fixtures/flip-left"
+import { events as rotate } from "./fixtures/rotateClockwise"
 
 interface IHandler {
     (event: string, cb: (msg: string) => void): void
@@ -31,18 +32,18 @@ const commandFactorySpy = (handler: IHandler): ICommandConnection => ({
     close: () => undefined,
 })
 
-const flightMonitor = flow(eventSender, commandFactorySpy, movementMonitor)
+const monitor = curry(movementMonitor)(sensorFactory(20))
+const flightMonitor = flow(eventSender, commandFactorySpy, monitor)
 
 describe("Time Monitor", () => {
-    it("should wait for 20ms", async () => {
+    it("should wait for 200ms", async () => {
         let long = false, short = false
 
-        setTimeout(() => long = true, 40)
-        setTimeout(() => short = true, 10)
-        return await timeMonitor(20).then(() => {
-            equal(short, true)
-            equal(long, false)
-        })
+        setTimeout(() => long = true, 400)
+        setTimeout(() => short = true, 100)
+        await timeMonitor(200)
+        equal(short, true)
+        equal(long, false)
     })
 })
 
@@ -57,6 +58,13 @@ describe("Movement Monitor", () => {
     describe("When flipping", () => {
         it("should detect hovering", async () => {
             const monitor = flightMonitor(flipLeft)
+            await monitor(2000, FlightState.hovering)
+            ok(true)
+        })
+    })
+    describe("When rotating", () => {
+        it("should detect hovering", async () => {
+            const monitor = flightMonitor(rotate)
             await monitor(2000, FlightState.hovering)
             ok(true)
         })

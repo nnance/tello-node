@@ -1,4 +1,4 @@
-import { FlightState, eventProcessorFactory } from "./sensors";
+import { FlightState, SensorHandler } from "./sensors";
 import { ICommandConnection } from "./ports";
 
 const detectionInterval = 500
@@ -8,12 +8,16 @@ export interface IMovementMonitor {
     (ms?: number, state?: FlightState): Promise<void>
 }
 
-export const movementMonitor = (drone?: ICommandConnection): IMovementMonitor => {
+export interface MovementMonitor {
+    (sensorHandler: SensorHandler, drone?: ICommandConnection): IMovementMonitor
+}
+
+export const movementMonitor: MovementMonitor = (sensorHandler, conn?) => {
     let flightState = FlightState.landed
 
     // this sets up the flight state handler to track the current flight state
-    if (drone) {
-        drone.on("message", eventProcessorFactory((state: FlightState) => flightState = state))
+    if (conn) {
+        conn.on("message", sensorHandler((state: FlightState) => flightState = state))
     }
 
     // send command and wait until flight state is reached or timeout occurs
