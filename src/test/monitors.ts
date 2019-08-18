@@ -1,9 +1,9 @@
 import { equal, ok } from "assert"
 import { flow } from "lodash/fp";
 
-import { timeMonitor, movementMonitor } from "../monitors";
+import { timeMonitor, movementMonitorFactory, sensorOverride } from "../monitors";
 import { ICommandConnection } from "../ports";
-import { FlightState } from "../sensors";
+import { FlightState, sensorFactory } from "../sensors";
 
 import { events as takeoff } from "./fixtures/takeoff"
 import { events as flipLeft } from "./fixtures/flip-left"
@@ -31,6 +31,7 @@ const commandFactorySpy = (handler: IHandler): ICommandConnection => ({
     close: () => undefined,
 })
 
+const movementMonitor = (conn: ICommandConnection) => movementMonitorFactory(sensorOverride(20), conn)
 const flightMonitor = flow(eventSender, commandFactorySpy, movementMonitor)
 
 describe("Time Monitor", () => {

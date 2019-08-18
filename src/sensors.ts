@@ -8,7 +8,7 @@ export interface FlightStateHandler {
     (state: FlightState): void
 }
 
-const queueDepthDefault = 20
+const queueDepthDefault = 60
 
 const stateHandler = (queue: string[], msg: string) => {
     return queue.concat(msg)
@@ -27,8 +27,8 @@ const isHovering = (queue: string[]) => {
     return queue.filter((val) => val.indexOf(";h:0;") > 0).length < queue.length
 }
 
-export const eventProcessorFactory = (cb: FlightStateHandler, maxQueueDepth = queueDepthDefault, initialQueue = [] as string[]) => {
-    let queue = initialQueue
+export const sensorFactory = (cb: FlightStateHandler, maxQueueDepth = queueDepthDefault, initialQueue: string[] = []) => {
+    let queue: string[] = initialQueue
     let trimmer = trimQueue(maxQueueDepth)
     return (msg: string) => {
         queue = trimmer(stateHandler(queue, msg))
