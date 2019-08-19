@@ -20,10 +20,25 @@ const flipMission = async () => {
 const moveMission = async () => {
     await timeMonitor(1000)
     await controller.takeOff()
-    await controller.flip(Direction.forward)
     await controller.forward(120)
     await controller.land()
     controller.disconnect()
 }
 
-moveMission()
+const rotateTest = async () => {
+    await controller.takeOff()
+    await controller.rotateClockwise(180)
+    await controller.land()
+    controller.disconnect()
+}
+
+const returnMission = async () => {
+    await controller.takeOff()
+    await controller.forward(120)
+    await controller.rotateClockwise(180)
+    await controller.forward(120)
+    await controller.land()
+    controller.disconnect()
+}
+
+returnMission()

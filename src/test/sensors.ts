@@ -49,7 +49,7 @@ describe("Movement Sensor", () => {
     describe("when receiving events with movement", () => {
         let state: FlightState
         const stateHandler = (val: FlightState) => state = val
-        const handler = sensorFactory(stateHandler, 10, hoverQueue)
+        const handler = sensorFactory(stateHandler, 10, ["pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:0;templ:91;temph:94;tof:31;h:10;bat:89;baro:-26.14;time:18;agx:4.00;agy:9.00;agz:-1006.00;"])
 
         it("should return moving state", () => {
             handler("pitch:0;roll:0;yaw:0;vgx:0;vgy:0;vgz:-7;templ:91;temph:94;tof:31;h:10;bat:89;baro:-26.14;time:18;agx:4.00;agy:9.00;agz:-1006.00;")
