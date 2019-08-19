@@ -1,4 +1,5 @@
 import { flow } from "lodash/fp";
+import { isArray } from "util";
 
 export enum FlightState {
     landed = 0,
@@ -41,8 +42,8 @@ export const sensorFactory = (cb: FlightStateHandler, maxQueueDepth = queueDepth
     let queue: string[] = initialQueue
     let trimmer = flow(stateHandler, trimQueue(maxQueueDepth))
     
-    return (msg: string) => {
-        queue = trimmer(queue, msg)
+    return (msg: string | Uint16Array) => {
+        queue = trimmer(queue, msg + "")
         if (isMoving(queue)) {
             cb(FlightState.moving)
         } else if (isHovering(queue)) {
